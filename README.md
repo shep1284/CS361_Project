@@ -23,7 +23,7 @@ response = socket.recv_json()
 print(f"Random Martian Date: {response['date']}")
 print(f"Selected Rover: {response['rover']}")
 
-Receiving Data
+# Receiving Data
 The microservice responds with a JSON object containing the generated random date and rover. Ensure that your code can handle this JSON response.
 
 +---------------------+               +-------------------------------+
