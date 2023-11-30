@@ -1,10 +1,8 @@
 import requests
 import zmq
 import json
-import random
-from datetime import date
+from datetime import datetime, timedelta
 
-# Replace 'YOUR_API_KEY' with your actual NASA API key
 api_key = 'dRULOYhcKMWprfcfsEmheI937pQXkvOdLxVGyD3b'
 
 # ZeroMQ configuration
@@ -37,13 +35,14 @@ def request_random_date():
     socket.connect(zmq_server)
 
     # Send a 'generate' request
-    socket.send(b"generate")
+    socket.send(b"random")
 
     # Receive the response, which will be a JSON object containing the random date
-    response = socket.recv_json()
-    random_date = response["date"]
+    response = socket.recv_string()
+    random_date = response
 
-    print(f"Requesting data for a random date: {random_date}")
+    print(f"Received random date from microservice: {random_date}")
+    search_nasa_apod(random_date)
 
     # Close the ZeroMQ socket
     socket.close()
@@ -53,12 +52,20 @@ def main():
 
     while True:
         print("NASA APOD API Search Tool")
-        choice = input("Enter 'random' to get data for a random date, 'exit' to quit: ")
+        choice = input("Enter 'manual' to enter a date manually, 'random' to get data for a random date, 'exit' to quit: ")
 
         if choice.lower() == 'exit':
             break
+        elif choice.lower() == 'manual':
+            # Allow the user to enter a date manually
+            date_input = input("Enter a date in the format 'YYYY-MM-DD' (e.g., '2014-08-29'): ")
+            try:
+                datetime.strptime(date_input, "%Y-%m-%d")
+                search_nasa_apod(date_input)
+            except ValueError:
+                print("Invalid date format. Please enter a date in the correct format.\n")
         elif choice.lower() == 'random':
-            # Request a random date
+            # Request a random date from the microservice
             request_random_date()
         else:
             print("Invalid choice. Try again.\n")
